@@ -3,6 +3,9 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET ?? "",
   databaseUrl: process.env.DATABASE_URL ?? "",
   redisUrl: process.env.REDIS_URL ?? "",
+  // Load-test window knobs. Defaults are production-safe; raise only for tests.
+  rlSignupMax: Number(process.env.RATE_LIMIT_SIGNUP_MAX ?? 10),
+  rlLoginMax: Number(process.env.RATE_LIMIT_LOGIN_MAX ?? 20),
 } as const;
 
 if (!config.jwtSecret) throw new Error("JWT_SECRET required");
