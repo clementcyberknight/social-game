@@ -43,8 +43,9 @@ export const likeService = {
       return ins.length ? "liked" : "already_liked";
     });
     if (status === "liked") {
+      // Only the single post cache is dropped. Feed pages stay cached for
+      // their TTL — like counts there are eventually consistent (≤15s stale).
       await cache.del(`post:${postId}`);
-      await cache.bumpGen();
     }
     return status;
   },
@@ -57,7 +58,6 @@ export const likeService = {
     });
     if (status === "unliked") {
       await cache.del(`post:${postId}`);
-      await cache.bumpGen();
     }
     return status;
   },
