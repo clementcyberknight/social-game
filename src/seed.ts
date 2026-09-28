@@ -21,7 +21,7 @@ for (let i = 0; i < USERS; i += BATCH) {
     email: `seed-${TAG}-${i + k}@seed.test`,
     password_hash: hash,
   }));
-  await sql`INSERT INTO users (email, password_hash) VALUES ${sql(rows)} ON CONFLICT DO NOTHING`;
+  await sql`INSERT INTO users ${sql(rows)} ON CONFLICT DO NOTHING`;
   console.log(`users ${Math.min(i + n, USERS)}/${USERS}`);
 }
 const ids = (await sql`SELECT id FROM users WHERE email LIKE ${`seed-${TAG}-%`} ORDER BY id`)
@@ -38,7 +38,7 @@ for (let i = 0; i < POSTS; i += BATCH) {
     user_id: ids[(i + k) % ids.length]!,
     body: `${bodies[(i + k) % bodies.length]} #${i + k}`,
   }));
-  await sql`INSERT INTO posts (user_id, body) VALUES ${sql(rows)}`;
+  await sql`INSERT INTO posts ${sql(rows)}`;
   console.log(`posts ${Math.min(i + n, POSTS)}/${POSTS}`);
 }
 const postIds = (await sql`SELECT id FROM posts ORDER BY id DESC LIMIT ${POSTS}`)
@@ -56,7 +56,7 @@ while (pairs.length < LIKES) {
   pairs.push({ user_id: u, post_id: p });
 }
 for (let i = 0; i < pairs.length; i += BATCH) {
-  await sql`INSERT INTO likes (user_id, post_id) VALUES ${sql(pairs.slice(i, i + BATCH))} ON CONFLICT DO NOTHING`;
+  await sql`INSERT INTO likes ${sql(pairs.slice(i, i + BATCH))} ON CONFLICT DO NOTHING`;
   console.log(`likes ${Math.min(i + BATCH, pairs.length)}/${pairs.length}`);
 }
 
