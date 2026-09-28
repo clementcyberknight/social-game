@@ -39,7 +39,9 @@ Each iteration changes the architecture, load-tests, and records the ceiling her
 - Validation: strict email regex, password 8–72 chars w/ letter+digit, post body 1–500 chars,
   numeric id guard, clamped pagination, 8KB JSON cap — every route returns 400, never throws.
 - Auth: argon2id hash, 7-day HS256 JWT (`sub/jti/exp`), Redis `bl:{jti}` blocklist checked
-  first with Postgres `revoked_tokens` as fallback. Login/signup rate-limited per IP, generic errors.
+  first with Postgres `revoked_tokens` as fallback. Generic error messages.
+  No app-level rate limiting (removed for the load experiment; abuse protection
+  belongs at the proxy / WAF layer).
 - Hardening: security headers (nosniff/DENY/no-referrer), no stack/SQL leaks (500 is generic),
   tagged-template SQL only (injection-safe), private DBs, secrets via env only.
 

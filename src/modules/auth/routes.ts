@@ -2,17 +2,13 @@ import { authService } from "./service.ts";
 import { requireAuth } from "../../middleware/auth.ts";
 import { json, unauthorized } from "../../lib/http.ts";
 import { validEmail, validPassword } from "../../lib/validate.ts";
-import { safeJson, rateLimit } from "../../lib/security.ts";
+import { safeJson } from "../../lib/security.ts";
 import type { LogFn } from "../../lib/logger.ts";
 
 const noop: LogFn = () => {};
 
 export const authRoutes = {
   async signup(req: Request, ip: string, log: LogFn = noop) {
-    if (!rateLimit(`signup:${ip}`, 10, 60_000)) {
-      log("auth.signup.rate_limited", { ip });
-      return json({ error: "too many requests" }, 429);
-    }
     const body = await safeJson(req);
     if (!body.ok) return json({ error: "invalid json" }, 400);
     const { email, password } = body.value as { email?: unknown; password?: unknown };
@@ -35,10 +31,6 @@ export const authRoutes = {
   },
 
   async login(req: Request, ip: string, log: LogFn = noop) {
-    if (!rateLimit(`login:${ip}`, 20, 60_000)) {
-      log("auth.login.rate_limited", { ip });
-      return json({ error: "too many requests" }, 429);
-    }
     const body = await safeJson(req);
     if (!body.ok) return json({ error: "invalid json" }, 400);
     const { email, password } = body.value as { email?: unknown; password?: unknown };

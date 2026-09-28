@@ -1,28 +1,6 @@
-// Tiny in-memory fixed-window rate limiter. No leak: capped Map + periodic sweep.
-const hits = new Map<string, { count: number; reset: number }>();
-const MAX_KEYS = 5000;
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, v] of hits) if (v.reset < now) hits.delete(k);
-  // hard cap: drop oldest if abused
-  while (hits.size > MAX_KEYS) {
-    const first = hits.keys().next().value;
-    if (first === undefined) break;
-    hits.delete(first);
-  }
-}, 60_000).unref?.();
-
-export function rateLimit(key: string, max: number, windowMs: number): boolean {
-  const now = Date.now();
-  const cur = hits.get(key);
-  if (!cur || cur.reset < now) {
-    hits.set(key, { count: 1, reset: now + windowMs });
-    return true;
-  }
-  cur.count++;
-  return cur.count <= max;
-}
+// Security headers + bounded JSON parsing. No rate limiter: removed by design
+// (load experiment showed it masking real capacity; abuse protection lives
+// at the proxy / WAF layer instead).
 
 export const SEC_HEADERS = {
   "x-content-type-options": "nosniff",

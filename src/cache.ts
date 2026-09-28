@@ -25,7 +25,7 @@ export const cache = {
     try { await redis.del(...keys); } catch {}
   },
 
-  // exists check for blocklist / rate-limit style keys (plain string values)
+  // exists check for blocklist-style keys (plain string values)
   async exists(key: string): Promise<boolean> {
     if (!enabled) return false;
     try { return Boolean(await redis.exists(key)); } catch { return false; }
