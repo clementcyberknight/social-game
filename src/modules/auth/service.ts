@@ -14,7 +14,8 @@ export const authService = {
     const rows = await sql`SELECT id,password_hash FROM users WHERE email=${email.toLowerCase()} LIMIT 1`;
     if (!rows.length) return null;
     if (!(await verifyPassword(password, rows[0].password_hash as string))) return null;
-    return signJWT(rows[0].id as number, SEVEN_DAYS_SEC);
+    const userId = rows[0].id as number;
+    return { token: await signJWT(userId, SEVEN_DAYS_SEC), userId };
   },
 
   async logout(jti: string, exp: number) {
