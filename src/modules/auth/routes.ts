@@ -3,14 +3,13 @@ import { requireAuth } from "../../middleware/auth.ts";
 import { json, unauthorized } from "../../lib/http.ts";
 import { validEmail, validPassword } from "../../lib/validate.ts";
 import { safeJson, rateLimit } from "../../lib/security.ts";
-import { config } from "../../config.ts";
 import type { LogFn } from "../../lib/logger.ts";
 
 const noop: LogFn = () => {};
 
 export const authRoutes = {
   async signup(req: Request, ip: string, log: LogFn = noop) {
-    if (!rateLimit(`signup:${ip}`, config.rlSignupMax, 60_000)) {
+    if (!rateLimit(`signup:${ip}`, 10, 60_000)) {
       log("auth.signup.rate_limited", { ip });
       return json({ error: "too many requests" }, 429);
     }
@@ -36,7 +35,7 @@ export const authRoutes = {
   },
 
   async login(req: Request, ip: string, log: LogFn = noop) {
-    if (!rateLimit(`login:${ip}`, config.rlLoginMax, 60_000)) {
+    if (!rateLimit(`login:${ip}`, 20, 60_000)) {
       log("auth.login.rate_limited", { ip });
       return json({ error: "too many requests" }, 429);
     }
